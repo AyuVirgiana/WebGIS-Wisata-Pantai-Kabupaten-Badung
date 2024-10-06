@@ -27,7 +27,7 @@ const Banner = () => {
               <h1 className="text-4xl font-bold md:text-5xl lg:text-6xl">Temukan Tujuan Wisata Pantai di Kabupaten Badung</h1>
               <p className="mt-4 text-lg md:text-xl lg:text-2xl">Mulai pencarian pantai Anda dengan Go-Beach dan nikmati pengalaman wisata yang luar biasa!</p>
               <Link href="/maps" className='inline-block mt-8 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300'>
-                Maps
+                Map
               </Link>
             </div>
           </div>
