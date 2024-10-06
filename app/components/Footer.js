@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { Background } from './Background';
 import { Section } from './Section';
 import { Logo } from './Logo';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope } from '@fortawesome/free-regular-svg-icons'; // Regular icon for email
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'; // Brands icon for WhatsApp
 
 const Footer = () => (
   <Background color="bg-gray-700">
@@ -11,12 +14,11 @@ const Footer = () => (
           <Logo />
         </div>
         <div className="flex space-x-6 mb-6">
-        <a href="https://wa.me/6285792554820" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
-            <li className="fab fa-whatsapp hover:text-green-500 transition-colors duration-200"/>
+          <a href="https://wa.me/6285792554820" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faWhatsapp} className="hover:text-green-500 transition-colors duration-200" />
           </a>
-
           <a href="mailto:ayuvirgiana10@gmail.com" aria-label="Email" target="_blank">
-            <li className="fas fa-envelope-open hover:text-blue-500 transition-colors duration-200"/>
+            <FontAwesomeIcon icon={faEnvelope} className="hover:text-blue-500 transition-colors duration-200" />
           </a>
         </div>
         <ul className="flex space-x-6 text-gray-400 mb-6">
@@ -25,7 +27,7 @@ const Footer = () => (
           </li>
         </ul>
         <p className="text-gray-500 text-sm">
-          &copy; {new Date().getFullYear()} Beach Website. All rights reserved.
+          &copy; {new Date().getFullYear()} WebGIS Pencarian Wisata Pantai di Kabupaten Badung. Semua hak dilindungi.
         </p>
       </div>
     </Section>
