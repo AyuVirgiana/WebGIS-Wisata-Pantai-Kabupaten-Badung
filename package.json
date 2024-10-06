@@ -12,7 +12,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mapbox/mapbox-gl-directions": "^4.3.1",
+    "@mapbox/mapbox-gl-directions": "github:AyuVirgiana/mapbox-gl-directions",
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@mapbox/mapbox-sdk": "^0.16.0",
     "@mapbox/search-js-web": "^1.0.0-beta.21",
