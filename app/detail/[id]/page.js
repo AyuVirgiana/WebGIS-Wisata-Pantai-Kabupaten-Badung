@@ -94,7 +94,7 @@ const DetailPage = () => {
         </a>
         <div className="flex space-x-4">
           <a href="/" className="text-white hover:text-gray-200">Home</a>
-          <a href="/maps" className="text-white hover:text-gray-200">Maps</a>
+          <a href="/maps" className="text-white hover:text-gray-200">Map</a>
         </div>
       </nav>
 

@@ -145,7 +145,7 @@ const Sidebar = () => {
           </div>
           <div className="flex flex-col mt-3">
             <Link href="/maps?findNearest=true" className={`mt-2 text-center w-full rounded-lg bg-[#4285F4] px-2 py-2 text-white hover:bg-blue-700 transition-all duration-300 focus:outline-none  ${activeButton === 'findNearest' ? 'bg-blue-700' : 'bg-[#4285F4]'}`}>
-              Cari Lokasi Terdekat Anda
+              Cari Pantai Terdekat
             </Link>
           </div>
           <div className="flex flex-col mt-3 gap-3">
@@ -168,7 +168,7 @@ const Sidebar = () => {
               Petang
             </Link>
             <Link href="" onClick={handleLogout} className="mt-2 text-center w-full rounded-lg bg-[#EA4D46] px-2 py-2 text-white hover:bg-[#EB3931] focus:outline-none focus:ring-2 focus:ring-[#EB0B01] transition-all duration-300">
-                    Keluar
+              Keluar
             </Link>
           </div>
         </div>

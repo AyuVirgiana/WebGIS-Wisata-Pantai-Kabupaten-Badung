@@ -54,13 +54,13 @@ const LoginPage = ({ onClose }) => {
           </svg>
         </button>
         <h2 className="mb-6 text-center text-2xl font-bold text-[#222831]">
-          Login
+          Sign In
         </h2>
         <button
           onClick={handleGoogleSignIn}
           className="mt-2 w-full rounded-lg bg-[#4285F4] px-4 py-2 font-bold text-white hover:bg-[#1967D2] focus:outline-none focus:ring-2 focus:ring-[#4285F4]"
         >
-          <i className="fab fa-google mr-2"></i> Daftar dengan Google
+          <i className="fab fa-google mr-2"></i> Sign In dengan Google
         </button>
         {error && <p className="mt-4 text-red-500">{error}</p>}
       </div>
