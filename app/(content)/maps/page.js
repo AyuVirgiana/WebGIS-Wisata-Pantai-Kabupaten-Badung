@@ -137,7 +137,8 @@ const MapsPage = () => {
     const localGeocoder1 = (query) => {
       const matchingFeatures = [];
       beachData.forEach((item) => {
-        if (item.properties.name.toLowerCase().includes(query.toLowerCase())) {
+        // Pastikan item.properties.name ada dan tidak undefined
+        if (item.properties.name && item.properties.name.toLowerCase().includes(query.toLowerCase())) {
           matchingFeatures.push({
             type: "Feature",
             geometry: item.geometry,
@@ -160,45 +161,67 @@ const MapsPage = () => {
       });
       return matchingFeatures;
     };
+      
 
     const geocoder = new MapboxGeocoder({
       accessToken: token,
-      localGeocoder: localGeocoder1,
+      localGeocoder: localGeocoder1, // Memungkinkan geocoder lokal
       zoom: 14,
       placeholder: "Masukkan pencarian, contoh: Pantai",
       mapboxgl: mapboxgl,
       language: "id",
       trackProximity: false,
+      limit: 15, // Batasi jumlah hasil
     });
-
+    
+    // Mendengarkan event "results" untuk menangani hasil
+    geocoder.on("results", (event) => {
+      // Hanya menampilkan hasil dari localGeocoder
+      const localResults = localGeocoder1(event.query);
+      
+      // Hapus hasil default dari Mapbox (jika ada)
+      if (event.results && event.results.length > 0) {
+        event.results.forEach(result => {
+          if (result.place_type && result.place_type.includes("beach")) {
+            // Logika untuk menambahkan hasil lokal jika diperlukan
+          }
+        });
+      }
+    
+      // Menambahkan hasil dari local geocoder
+      if (localResults.length > 0) {
+        localResults.forEach((result) => {
+          geocoder.addResult(result);
+        });
+      }
+    });
+    
+    // Mendengarkan event "result" untuk menangani hasil yang dipilih
     geocoder.on("result", (event) => {
       const features = event.result;
-
+    
       if (features) {
-       
         setSelectedPlace(features);
         clearDestinationMarkers();
-
+    
         const destinationMarker = new mapboxgl.Marker({
           color: "#FF0000",
         })
-          .setLngLat([
-            features.geometry.coordinates._long,
-            features.geometry.coordinates._lat,
-          ])
+          .setLngLat(features.geometry.coordinates)
           .addTo(map);
-          destinationMarker.getElement().style.cursor = 'pointer'; 
-
-          destinationMarker.getElement().addEventListener('mouseenter', () => {
-            destinationMarker.getElement().style.cursor = 'pointer';
-          });
-      
-          destinationMarker.getElement().addEventListener('mouseleave', () => {
-            destinationMarker.getElement().style.cursor = '';
-          });
-      
-          destinationMarkerRefs.current.push(destinationMarker);
-
+        
+        destinationMarker.getElement().style.cursor = 'pointer';
+    
+        destinationMarker.getElement().addEventListener('mouseenter', () => {
+          destinationMarker.getElement().style.cursor = 'pointer';
+        });
+    
+        destinationMarker.getElement().addEventListener('mouseleave', () => {
+          destinationMarker.getElement().style.cursor = '';
+        });
+    
+        destinationMarkerRefs.current.push(destinationMarker);
+    
         if (userLocation && directions) {
           directions.setOrigin(userLocation);
           directions.setDestination(features.geometry.coordinates);
@@ -207,6 +230,7 @@ const MapsPage = () => {
         setSelectedPlace(null);
       }
     });
+    
 
     map.addControl(geocoder, "top-right");
     map.addControl(geolocate, "bottom-right");
