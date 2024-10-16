@@ -16,7 +16,7 @@ const LoginPage = ({ onClose }) => {
       Swal.fire({
         icon: 'success',
         title: 'Login Berhasil',
-        text: 'Anda Sudah berhasil melakukan login',
+        text: 'Anda berhasil melakukan login!',
         confirmButtonText: 'Oke'
       });
       router.push('/maps');

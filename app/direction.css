@@ -19,7 +19,7 @@
 
 /* direction.css */
 
-.mapbox-directions-profile {
+/* .mapbox-directions-profile {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,6 +28,27 @@
   border-radius: 4px;
   padding: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+} */
+@media only screen and (max-width: 767px) {
+  .mapbox-directions-profile {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      box-shadow: none;
+      gap: 10px;
+      width: 100vw;
+      position: absolute;
+      top: 112px;
+  }
+  .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+    float: left;
+    margin: 0;
+  }
+  .mapboxgl-ctrl-top-right {
+    right: 0;
+    top: 52px;
+  }
 }
 
 .mapbox-directions-profile label {
