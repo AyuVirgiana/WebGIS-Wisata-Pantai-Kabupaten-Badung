@@ -70,7 +70,7 @@
   .mapboxgl-ctrl-top-right {
     position: fixed !important;
     right: 0;
-    top: 50px;
+    top: 52px;
     width: 100%;
     z-index: 2;
     box-shadow: none;
@@ -87,9 +87,15 @@
 
   .mapbox-directions-profile {
     gap: 10px;
-    width:100vw;
+    width: 100vw;
+    position: absolute !important;
+    top: 112px !important;
   }
 
+  .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+    float: left;
+    margin: 0 !important;
+  }
 
   .mapboxgl-ctrl-top-left {
     position: fixed !important;
