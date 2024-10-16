@@ -70,7 +70,7 @@
   .mapboxgl-ctrl-top-right {
     position: fixed !important;
     right: 0;
-    top: 52px;
+    top: 52px !important;
     width: 100%;
     z-index: 2;
     box-shadow: none;
