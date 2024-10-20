@@ -65,9 +65,9 @@ const Hero = () => {
               </>
             ) : (
               <>
-                <li>
+                {/* <li>
                   <button onClick={() => setShowLoginModal(true)} className='mx-4 hover:text-blue-600'>Daftar</button>
-                </li>
+                </li> */}
               </>
             )}
           </NavbarTwoColumns>

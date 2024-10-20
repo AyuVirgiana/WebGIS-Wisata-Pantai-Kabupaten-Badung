@@ -533,17 +533,28 @@ const MapsPage = () => {
       >
         Detail
       </button>
-      <button
-        className="bg-green-500 text-white px-2 py-2 rounded-lg w-full md:w-28 m-1 md:m-2 hover:bg-green-600 transition-all duration-300"
-        onClick={() =>
-          handleRouteClick([
-            selectedPlace.geometry.coordinates._long,
-            selectedPlace.geometry.coordinates._lat,
-          ])
-        }
-      >
-        Rute
-      </button>
+<button
+className="bg-green-500 text-white px-2 py-2 rounded-lg w-full md:w-28 m-1 md:m-2 hover:bg-green-600 transition-all duration-300"
+onClick={() => {
+console.log("Tombol diklik!"); // Debugging
+const profile = document.querySelector('.mapbox-directions-profile');
+console.log("Profile Element:", profile); // Pastikan elemen ditemukan
+
+if (profile) {
+profile.style.display = 'block';
+} else {
+console.error("Elemen .mapbox-directions-profile tidak ditemukan!");
+}
+
+handleRouteClick([
+selectedPlace.geometry.coordinates._long,
+selectedPlace.geometry.coordinates._lat,
+]);
+}}
+>
+Rute
+</button>
+
     </div>
   </div>
 )}
