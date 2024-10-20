@@ -15,16 +15,16 @@ const LoginPage = ({ onClose }) => {
       await signInWithPopup(auth, provider);
       Swal.fire({
         icon: 'success',
-        title: 'Login Berhasil',
-        text: 'Anda berhasil melakukan login!',
+        title: 'Sign in Berhasil',
+        text: 'Anda berhasil melakukan sign in!',
         confirmButtonText: 'Oke'
       });
       router.push('/maps');
     } catch (error) {
       Swal.fire({
         icon: 'error',
-        title: 'Login Gagal',
-        text: 'Anda gagal melakukan login!',
+        title: 'Sign In Gagal',
+        text: 'Anda gagal melakukan sign in!',
         confirmButtonText: 'oke'
       });
       console.error(error);

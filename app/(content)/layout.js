@@ -13,8 +13,8 @@ export default function MapsLayout({ children }) {
     if (!loading && !user) {
       Swal.fire({
         icon: 'error',
-        title: 'Belum Login',
-        text: 'Pastikan Anda Login',
+        title: 'Belum Sign In',
+        text: 'Mohon Sign In Terlebih Dahulu',
         confirmButtonText: 'oke'
       });
       router.push('/');
