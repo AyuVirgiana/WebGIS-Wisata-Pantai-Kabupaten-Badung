@@ -137,20 +137,18 @@ const MapsPage = () => {
     const localGeocoder1 = (query) => {
       const matchingFeatures = [];
       beachData.forEach((item) => {
-        // Pastikan item.properties.name ada dan tidak undefined
-        if (item.properties.name && item.properties.name.toLowerCase().includes(query.toLowerCase())) {
+        // Pastikan item.properties.nama ada dan tidak undefined
+        if (item.nama && item.nama.toLowerCase().includes(query.toLowerCase())) {
           matchingFeatures.push({
             type: "Feature",
             geometry: item.geometry,
-            properties: {
-              id: item.id,
-              name: item.properties.name,
-              image: item.properties.image_tumb,
-              rating: item.properties.rating,
-              kecamatan: item.properties.kecamatan,
-              location: item.properties.alamat,
-            },
-            place_name: item.properties.name,
+            id: item.id,
+            nama: item.nama,
+            image: item.image_thumb,
+            rating: item.rating,
+            kecamatan: item.kecamatan,
+            location: item.alamat,
+            place_nama: item.nama,
             center: [
               item.geometry.coordinates._long,
               item.geometry.coordinates._lat,
@@ -306,14 +304,12 @@ const MapsPage = () => {
                 "_lat": beach.geometry.coordinates._lat
               },
             },
-            properties: {
               id: beach.id,
-              name: beach.properties.name,
-              image: beach.properties.image_tumb,
-              rating: beach.properties.rating,
-              kecamatan: beach.properties.kecamatan,
-              alamat: beach.properties.alamat,
-            },
+              nama: beach.nama,
+              image: beach.image_thumb,
+              rating: beach.rating,
+              kecamatan: beach.kecamatan,
+              alamat: beach.alamat,
           });
         });
   
@@ -329,7 +325,7 @@ const MapsPage = () => {
   const findKecamatan = (kecamatan, map) => {
     try {
       const beachesInKecamatan = beachData.filter((beach) => {
-        return beach.properties.kecamatan.toLowerCase() === kecamatan.toLowerCase();
+        return beach.kecamatan.toLowerCase() === kecamatan.toLowerCase();
       });
   
       clearDestinationMarkers();
@@ -359,14 +355,12 @@ const MapsPage = () => {
                 "_lat": beach.geometry.coordinates._lat
               },
             },
-            properties: {
               id: beach.id,
-              name: beach.properties.name,
-              image: beach.properties.image_tumb,
-              rating: beach.properties.rating,
-              kecamatan: beach.properties.kecamatan,
-              alamat: beach.properties.alamat,
-            },
+              nama: beach.nama,
+              image: beach.image_thumb,
+              rating: beach.rating,
+              kecamatan: beach.kecamatan,
+              alamat: beach.alamat,
           });
         });
   
@@ -418,14 +412,12 @@ const MapsPage = () => {
                 "_lat":beach.geometry.coordinates._lat
               },
             },
-            properties: {
               id: beach.id,
-              name: beach.properties.name,
-              image: beach.properties.image_tumb,
-              rating: beach.properties.rating,
-              kecamatan: beach.properties.kecamatan,
-              alamat: beach.properties.alamat,
-            },
+              nama: beach.nama,
+              image: beach.image_thumb,
+              rating: beach.rating,
+              kecamatan: beach.kecamatan,
+              alamat: beach.alamat,
           });
         });
     
@@ -500,19 +492,19 @@ const MapsPage = () => {
     >
       X
     </button>
-    {selectedPlace.properties.image && (
+    {selectedPlace.image && (
       <img
-        src={selectedPlace.properties.image}
-        alt={selectedPlace.properties.name}
+        src={selectedPlace.image}
+        alt={selectedPlace.nama}
         className="w-full h-24 object-cover mb-2 rounded-lg"
       />
     )}
-    <p className="font-bold text-sm md:text-xs">{selectedPlace.properties.name}</p>
-    {selectedPlace.properties.rating && (
-      <p className="text-sm md:text-xs">Rating: {selectedPlace.properties.rating}</p>
+    <p className="font-bold text-sm md:text-xs">{selectedPlace.nama}</p>
+    {selectedPlace.rating && (
+      <p className="text-sm md:text-xs">Rating: {selectedPlace.rating}</p>
     )}
-    {selectedPlace.properties.kecamatan && (
-      <p className="text-sm md:text-xs">Kecamatan: {selectedPlace.properties.kecamatan}</p>
+    {selectedPlace.kecamatan && (
+      <p className="text-sm md:text-xs">Kecamatan: {selectedPlace.kecamatan}</p>
     )}
     {weather && (
       <div className="flex items-center mt-1">
@@ -528,7 +520,7 @@ const MapsPage = () => {
       <button
         className="bg-blue-500 text-white px-2 py-2 rounded-lg w-full md:w-28 m-1 md:m-2 hover:bg-blue-700 transition-all duration-300"
         onClick={() =>
-          handleDetailClick(selectedPlace.properties.id)
+          handleDetailClick(selectedPlace.id)
         }
       >
         Detail

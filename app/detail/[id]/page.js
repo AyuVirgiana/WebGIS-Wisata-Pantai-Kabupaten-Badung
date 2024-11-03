@@ -24,16 +24,16 @@ const DetailPage = () => {
   };
 
   const showNextImage = () => {
-    setSelectedIndex((prevIndex) => (prevIndex + 1) % data?.properties?.galery?.length);
+    setSelectedIndex((prevIndex) => (prevIndex + 1) % data?.galeri?.length);
   };
 
   const showPreviousImage = () => {
-    setSelectedIndex((prevIndex) => (prevIndex - 1 + data?.properties?.galery?.length) % data?.properties?.galery?.length);
+    setSelectedIndex((prevIndex) => (prevIndex - 1 + data?.galeri?.length) % data?.galeri?.length);
   };
 
   const getDataById = async (id) => {
     try {
-      const docRef = doc(firestore, 'wisata_pantai', id);
+      const docRef = doc(firestore, 'pantai', id);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -85,12 +85,12 @@ const DetailPage = () => {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  const selectedImage = selectedIndex !== null ? data.properties.galery[selectedIndex] : null;
+  const selectedImage = selectedIndex !== null ? data.galeri[selectedIndex] : null;
   return (
     <div className="container mx-auto p-5">
       <nav className="bg-blue-600 shadow-md py-4 px-6 flex justify-between items-center w-full fixed top-0 left-0 right-0 z-10">
         <a className="text-2xl font-bold text-white" href="/">
-          {data.properties.name}
+          {data.nama}
         </a>
         <div className="flex space-x-4">
           <a href="/" className="text-white hover:text-gray-200">Home</a>
@@ -100,21 +100,21 @@ const DetailPage = () => {
 
       <div className="pt-24">
         <div className="text-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">{data.properties.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">{data.nama}</h1>
           <p className="text-gray-800 flex justify-center items-center mb-2">
             <FontAwesomeIcon icon={faLocationDot} className="text-blue-500 text-lg md:text-xl mr-1 md:mr-2"/>
-            {data.properties.alamat}
+            {data.alamat}
           </p>
           <p className="text-gray-800 flex justify-center items-center">
             <FontAwesomeIcon icon={faStar} className="text-yellow-300 text-lg md:text-xl mr-1 md:mr-2"/>
-            {data.properties.rating}
+            {data.rating}
           </p>
         </div>
 
         <div className="mb-8 md:mb-32">
           <div className="flex justify-center md:px-24 px-6">
             <div className="w-full">
-              <img className=" md-full w-full object-cover" src={data.properties.image_tumb} alt={data.properties.name} />
+              <img className=" md-full w-full object-cover" src={data.image_tumb} alt={data.nama} />
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ const DetailPage = () => {
           <h2 className="font-bold text-xl md:text-2xl text-center text-gray-800 mb-6">Deskripsi</h2>
           <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-4">
             <section className="flex-1 bg-white overflow-hidden p-4 md:p-6 text-gray-800 text-justify mx-2 md:mx-20">
-              <div className="text-gray-800" dangerouslySetInnerHTML={{ __html: data.properties.deskripsi }} />
+              <div className="text-gray-800" dangerouslySetInnerHTML={{ __html: data.deskripsi }} />
             </section>
           </div>
         </section>
@@ -133,7 +133,7 @@ const DetailPage = () => {
           <div className="flex flex-col space-y-8 md:space-y-0 md:flex-row md:space-x-8 justify-center">
             <section className="flex-1 bg-white overflow-hidden p-6 text-gray-800 text-justify mx-4 md:mx-20">
               <div className="flex flex-wrap lg:w-4/5 sm:mx-auto sm:mb-2 -mx-2 p-4">
-                {data.properties.fasilitas.map((item, index) => (
+                {data.fasilitas.map((item, index) => (
                   <div key={index} className="p-2 sm:w-1/2 w-full">
                     <div className="bg-white rounded flex p-4 h-full items-center">
                       <svg
@@ -160,7 +160,7 @@ const DetailPage = () => {
         <section>
           <h2 className="font-bold text-xl md:text-2xl text-center text-gray-800 mb-4 md:mb-8">Galeri</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 md:gap-6 xl:gap-8 mx-2 md:mx-20 mt-4">
-            {data.properties.galery.map((item, index) => (
+            {data.galeri.map((item, index) => (
               <a
                 key={index}
                 className="group relative flex h-36 sm:h-48 md:h-64 items-end overflow-hidden bg-gray-100 shadow-lg cursor-pointer"
