@@ -114,7 +114,7 @@ const DetailPage = () => {
         <div className="mb-8 md:mb-32">
           <div className="flex justify-center md:px-24 px-6">
             <div className="w-full">
-              <img className=" md-full w-full object-cover" src={data.image_tumb} alt={data.nama} />
+              <img className=" md-full w-full object-cover" src={data.image_thumb} alt={data.nama} />
             </div>
           </div>
         </div>
