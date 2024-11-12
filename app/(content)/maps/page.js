@@ -194,7 +194,8 @@ const MapsPage = () => {
     
         // Membuat marker tujuan berwarna merah di lokasi yang dipilih
         const destinationMarker = new mapboxgl.Marker({ color: "#FF0000" })
-          .setLngLat([beach.geometry.coordinates[0], beach.geometry.coordinates[1]])
+          // .setLngLat([beach.geometry.coordinates[0], beach.geometry.coordinates[1]])
+          .setLngLat([features.geometry.coordinates[0], features.geometry.coordinates[1]])
           .addTo(map);
     
         // Ubah kursor menjadi pointer saat diarahkan ke marker tujuan
@@ -206,7 +207,11 @@ const MapsPage = () => {
         // Atur arah jika lokasi pengguna dan fitur directions tersedia
         if (userLocation && directions) {
           directions.setOrigin(userLocation); // Titik awal dari lokasi pengguna
-          directions.setDestination(features.geometry.coordinates); // Titik tujuan dari lokasi yang dipilih
+          directions.setDestination([
+            features.geometry.coordinates._long,
+            features.geometry.coordinates._lat,
+          ]);
+          
         }
       } else {
         // Reset tempat yang dipilih jika tidak ada fitur ditemukan
@@ -425,12 +430,36 @@ const MapsPage = () => {
     return distance / 1000;
   };
 
-  const handleRouteClick = (destination) => {
-    if (userLocation && destination && directions) {
+  // const handleRouteClick = (destination) => {
+  //   if (userLocation && destination && directions) {
+  //     directions.setOrigin(userLocation);
+  //     // directions.setDestination([destination.geometry.coordinates[0], destination.geometry.coordinates[1]]);
+  //     directions.setDestination([destination.geometry.coordinates._long, destination.geometry.coordinates._lat]);
+  //   }
+  // };
+
+  // const handleRouteClick = (destination) => {
+  //   if (userLocation && destination && directions) {
+  //     directions.setOrigin(userLocation);
+  //     directions.setDestination(destination);
+  //   }
+  // };
+  
+  const handleRouteClick = (selectedPlace) => {
+    if (userLocation && selectedPlace && directions) {
+      // Check if coordinates are in array format ([0], [1]) or in object format (_long, _lat)
+      const destinationCoordinates = Array.isArray(selectedPlace.geometry.coordinates)
+        ? selectedPlace.geometry.coordinates
+        : [
+            selectedPlace.geometry.coordinates._long,
+            selectedPlace.geometry.coordinates._lat
+          ];
+  
       directions.setOrigin(userLocation);
-      directions.setDestination(destination);
+      directions.setDestination(destinationCoordinates);
     }
   };
+  
 
   const handleDetailClick = (id) => {
 
@@ -510,11 +539,15 @@ const MapsPage = () => {
       } else {
       console.error("Elemen .mapbox-directions-profile tidak ditemukan!");
       }
+      
+      handleRouteClick(selectedPlace);
+      // handleRouteClick([
+      // selectedPlace.geometry.coordinates._long,
+      // selectedPlace.geometry.coordinates._lat,
 
-      handleRouteClick([
-      selectedPlace.geometry.coordinates._long,
-      selectedPlace.geometry.coordinates._lat,
-      ]);
+      // selectedPlace.geometry.coordinates[0],
+      // selectedPlace.geometry.coordinates[1],
+      // ]);
       }}
       >
       Rute
