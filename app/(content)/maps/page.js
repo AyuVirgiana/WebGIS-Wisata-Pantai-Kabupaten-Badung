@@ -35,19 +35,19 @@ const MapsPage = () => {
   useEffect(() => {
     const getData = async () => {
       const result = await fetchData();
-      setBeachData(result);
+      setBeachData(result.pantai); // Access the 'pantai' array from the result
     };
     getData();
   }, []);
 
-
   useEffect(() => {
     const fetchWeatherData = async () => {
       if (!selectedPlace) return;
-  
+
       const { geometry } = selectedPlace;
-      const { _long, _lat } = geometry.coordinates;
-  
+      const { coordinates } = geometry;
+      const { _long, _lat } = coordinates;
+
       try {
         const response = await geocodingClient.reverseGeocode({
           query: [_long, _lat],
@@ -77,17 +77,15 @@ const MapsPage = () => {
         setCity(null);
       }
     };
-  
+
     fetchWeatherData();
   }, [selectedPlace]);
-  
+
   useEffect(() => {
     const getCurrentLocation = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-      
           const { longitude, latitude } = position.coords;
-          // setUserLocation([115.170536, -8.624836]);
           setUserLocation([longitude, latitude]);
         },
         (error) => {
@@ -99,6 +97,7 @@ const MapsPage = () => {
 
     getCurrentLocation();
   }, []);
+
   useEffect(() => {
     if (!beachData || !userLocation) return;
 
@@ -137,21 +136,22 @@ const MapsPage = () => {
     const localGeocoder1 = (query) => {
       const matchingFeatures = [];
       beachData.forEach((item) => {
-        // Pastikan item.properties.nama ada dan tidak undefined
-        if (item.nama && item.nama.toLowerCase().includes(query.toLowerCase())) {
+        if (item.properties.nama && item.properties.nama.toLowerCase().includes(query.toLowerCase())) {
           matchingFeatures.push({
             type: "Feature",
             geometry: item.geometry,
-            id: item.id,
-            nama: item.nama,
-            image: item.image_thumb,
-            rating: item.rating,
-            kecamatan: item.kecamatan,
-            location: item.alamat,
-            place_nama: item.nama,
+            properties: {
+              id: item.id,
+              name: item.properties.nama,
+              image: item.properties.image_thumb,
+              rating: item.properties.rating,
+              kecamatan: item.properties.kecamatan,
+              location: item.properties.alamat,
+            },
+            place_name: item.properties.nama,
             center: [
-              item.geometry.coordinates._long,
-              item.geometry.coordinates._lat,
+              item.geometry.coordinates[0], // Use _long
+              item.geometry.coordinates[1], // Use _lat
             ],
             place_type: ["beach"],
           });
@@ -159,77 +159,61 @@ const MapsPage = () => {
       });
       return matchingFeatures;
     };
-      
 
     const geocoder = new MapboxGeocoder({
       accessToken: token,
-      localGeocoder: localGeocoder1, // Memungkinkan geocoder lokal
+      localGeocoder: localGeocoder1,
       zoom: 14,
       placeholder: "Masukkan pencarian, contoh: Pantai",
       mapboxgl: mapboxgl,
       language: "id",
       trackProximity: false,
-      limit: 15, // Batasi jumlah hasil
+      limit: 15,
     });
-    
-    // Mendengarkan event "results" untuk menangani hasil
+
     geocoder.on("results", (event) => {
-      // Hanya menampilkan hasil dari localGeocoder
+      // Mengambil hasil lokal dari pencarian pengguna
       const localResults = localGeocoder1(event.query);
       
-      // Hapus hasil default dari Mapbox (jika ada)
-      if (event.results && event.results.length > 0) {
-        event.results.forEach(result => {
-          if (result.place_type && result.place_type.includes("beach")) {
-            // Logika untuk menambahkan hasil lokal jika diperlukan
-          }
-        });
-      }
-    
-      // Menambahkan hasil dari local geocoder
-      if (localResults.length > 0) {
+      // Jika ada hasil yang ditemukan, tambahkan ke dalam geocoder
+      if (localResults?.length) {
         localResults.forEach((result) => {
           geocoder.addResult(result);
         });
       }
     });
     
-    // Mendengarkan event "result" untuk menangani hasil yang dipilih
     geocoder.on("result", (event) => {
+      // Mengambil data fitur dari hasil pencarian yang dipilih
       const features = event.result;
     
       if (features) {
+        // Set tempat yang dipilih dan bersihkan marker tujuan sebelumnya
         setSelectedPlace(features);
         clearDestinationMarkers();
     
-        const destinationMarker = new mapboxgl.Marker({
-          color: "#FF0000",
-        })
-          .setLngLat(features.geometry.coordinates)
+        // Membuat marker tujuan berwarna merah di lokasi yang dipilih
+        const destinationMarker = new mapboxgl.Marker({ color: "#FF0000" })
+          .setLngLat([beach.geometry.coordinates[0], beach.geometry.coordinates[1]])
           .addTo(map);
-        
+    
+        // Ubah kursor menjadi pointer saat diarahkan ke marker tujuan
         destinationMarker.getElement().style.cursor = 'pointer';
     
-        destinationMarker.getElement().addEventListener('mouseenter', () => {
-          destinationMarker.getElement().style.cursor = 'pointer';
-        });
-    
-        destinationMarker.getElement().addEventListener('mouseleave', () => {
-          destinationMarker.getElement().style.cursor = '';
-        });
-    
+        // Simpan marker tujuan ke dalam array referensi untuk pengelolaan lebih lanjut
         destinationMarkerRefs.current.push(destinationMarker);
     
+        // Atur arah jika lokasi pengguna dan fitur directions tersedia
         if (userLocation && directions) {
-          directions.setOrigin(userLocation);
-          directions.setDestination(features.geometry.coordinates);
+          directions.setOrigin(userLocation); // Titik awal dari lokasi pengguna
+          directions.setDestination(features.geometry.coordinates); // Titik tujuan dari lokasi yang dipilih
         }
       } else {
+        // Reset tempat yang dipilih jika tidak ada fitur ditemukan
         setSelectedPlace(null);
       }
     });
     
-
     map.addControl(geocoder, "top-right");
     map.addControl(geolocate, "bottom-right");
     map.addControl(navigation, "bottom-right");
@@ -258,92 +242,89 @@ const MapsPage = () => {
     setDirections(directionsInstance);
     map.addControl(directionsInstance, "top-left");
 
-
     if (searchParams.get("findNearest") === "true") {
       findNearestBeachesFromUserLocation(map);
     }
     if (searchParams.get("all") === "true") {
       findAll(map);
     }
-    if(searchParams.get("kecamatan")){
+    if (searchParams.get("kecamatan")) {
       const dataKecamatan = searchParams.get("kecamatan");
-      findKecamatan(dataKecamatan,map)
+      findKecamatan(dataKecamatan, map);
     }
     return () => map.remove();
   }, [beachData, userLocation, searchParams]);
 
-
-  const findAll =(map)=>{
+  const findAll = (map) => {
     try {
-  
       clearDestinationMarkers();
-  
+
       beachData.forEach((beach) => {
         const marker = new mapboxgl.Marker({
           color: "#36BA98",
         })
           .setLngLat([
-            beach.geometry.coordinates._long,
-            beach.geometry.coordinates._lat,
+            beach.geometry.coordinates[0],
+            beach.geometry.coordinates[1],
           ])
           .addTo(map);
-  
+
+        marker.getElement().style.cursor = 'pointer';
+        marker.getElement().addEventListener('mouseenter', () => {
           marker.getElement().style.cursor = 'pointer';
-          marker.getElement().addEventListener('mouseenter', () => {
-            marker.getElement().style.cursor = 'pointer';
-          });
-    
-          marker.getElement().addEventListener('mouseleave', () => {
-            marker.getElement().style.cursor = '';
-          });
+        });
+
+        marker.getElement().addEventListener('mouseleave', () => {
+          marker.getElement().style.cursor = '';
+        });
+
         marker.getElement().addEventListener("click", () => {
           setSelectedPlace({
             geometry: {
               coordinates: {
-                "_long": beach.geometry.coordinates._long,
-                "_lat": beach.geometry.coordinates._lat
+                "_long": beach.geometry.coordinates[0],
+                "_lat": beach.geometry.coordinates[1]
               },
             },
+            properties: {
               id: beach.id,
-              nama: beach.nama,
-              image: beach.image_thumb,
-              rating: beach.rating,
-              kecamatan: beach.kecamatan,
-              alamat: beach.alamat,
+              name: beach.properties.nama,
+              image: beach.properties.image_thumb,
+              rating: beach.properties.rating,
+              kecamatan: beach.properties.kecamatan,
+              alamat: beach.properties.alamat,
+            }
           });
         });
-  
-        destinationMarkerRefs.current.push(marker);
       });
-  
-      setNearestBeaches(beachData);
     } catch (error) {
-      console.error("Error adding markers:", error);
+      console.error(error);
     }
-  }
+  };
 
+  
   const findKecamatan = (kecamatan, map) => {
     try {
       const beachesInKecamatan = beachData.filter((beach) => {
-        return beach.kecamatan.toLowerCase() === kecamatan.toLowerCase();
+        return beach.properties.kecamatan.toLowerCase() === kecamatan.toLowerCase();
       });
-  
+
       clearDestinationMarkers();
-  
+
       beachesInKecamatan.forEach((beach) => {
         const marker = new mapboxgl.Marker({
           color: "#36BA98",
         })
           .setLngLat([
-            beach.geometry.coordinates._long,
-            beach.geometry.coordinates._lat,
+            beach.geometry.coordinates[0],
+            beach.geometry.coordinates[1],
           ])
           .addTo(map);
           marker.getElement().style.cursor = 'pointer';
           marker.getElement().addEventListener('mouseenter', () => {
             marker.getElement().style.cursor = 'pointer';
           });
-    
+
           marker.getElement().addEventListener('mouseleave', () => {
             marker.getElement().style.cursor = '';
           });
@@ -351,89 +332,81 @@ const MapsPage = () => {
           setSelectedPlace({
             geometry: {
               coordinates: {
-                "_long": beach.geometry.coordinates._long,
-                "_lat": beach.geometry.coordinates._lat
+                "_long": beach.geometry.coordinates[0],
+                "_lat": beach.geometry.coordinates[1]
               },
             },
+            properties: {
               id: beach.id,
-              nama: beach.nama,
-              image: beach.image_thumb,
-              rating: beach.rating,
-              kecamatan: beach.kecamatan,
-              alamat: beach.alamat,
+              name: beach.properties.name,
+              image: beach.properties.image_thumb,
+              rating: beach.properties.rating,
+              kecamatan: beach.properties.kecamatan,
+              alamat: beach.properties.alamat,
+            },
           });
         });
-  
+
         destinationMarkerRefs.current.push(marker);
       });
-  
+
       setNearestBeaches(beachesInKecamatan);
     } catch (error) {
       console.error("Error adding markers:", error);
     }
   };
-  
-  const findNearestBeachesFromUserLocation = (map) => {
-    try {
-      const beachesWithin10km = beachData.filter((beach) => {
-        const distance = calculateDistance(
-          userLocation[1],
-          userLocation[0],
-          beach.geometry.coordinates._lat,
-          beach.geometry.coordinates._long
-        );
-        return distance <= 10;
-      });
 
-      clearDestinationMarkers();
-
-      beachesWithin10km.forEach((beach) => {
-        const marker = new mapboxgl.Marker({
-          color: "#36BA98",
-        })
-          .setLngLat([
-            beach.geometry.coordinates._long,
-            beach.geometry.coordinates._lat,
-          ])
-          .addTo(map);
-          marker.getElement().style.cursor = 'pointer';
-          marker.getElement().addEventListener('mouseenter', () => {
-            marker.getElement().style.cursor = 'pointer';
-          });
-    
-          marker.getElement().addEventListener('mouseleave', () => {
-            marker.getElement().style.cursor = '';
-          });
-        marker.getElement().addEventListener("click", () => {
-          setSelectedPlace({
-            geometry: {
-              coordinates: {
-                "_long":beach.geometry.coordinates._long,
-                "_lat":beach.geometry.coordinates._lat
-              },
-            },
-              id: beach.id,
-              nama: beach.nama,
-              image: beach.image_thumb,
-              rating: beach.rating,
-              kecamatan: beach.kecamatan,
-              alamat: beach.alamat,
-          });
-        });
-    
-        destinationMarkerRefs.current.push(marker);
-      });
-
-      setNearestBeaches(beachesWithin10km);
-    } catch (error) {
-      console.error("Error adding markers:", error);
-    }
-  };
 
   const clearDestinationMarkers = () => {
-    destinationMarkerRefs.current.forEach((marker) => marker.remove());
+    destinationMarkerRefs.current.forEach(marker => marker.remove());
     destinationMarkerRefs.current = [];
   };
+
+  const findNearestBeachesFromUserLocation = (map) => {
+    if (!userLocation || !beachData) return;
+
+    const sortedBeaches = [...beachData].map((beach) => {
+      const [longitude, latitude] = beach.geometry.coordinates;
+      const distance = calculateDistance(userLocation[1], userLocation[0], latitude, longitude);
+      return {
+        ...beach,
+        distance,
+      };
+    }).sort((a, b) => a.distance - b.distance);
+
+    const nearestBeaches = sortedBeaches.slice(0, 5);
+    setNearestBeaches(nearestBeaches);
+
+    nearestBeaches.forEach((beach) => {
+      const marker = new mapboxgl.Marker({
+        color: "#36BA98",
+      })
+        .setLngLat([beach.geometry.coordinates[0], beach.geometry.coordinates[1]])
+        .addTo(map);
+
+      marker.getElement().style.cursor = 'pointer';
+
+      marker.getElement().addEventListener("click", () => {
+        setSelectedPlace({
+          geometry: {
+            coordinates: {
+              "_long": beach.geometry.coordinates[0],
+              "_lat": beach.geometry.coordinates[1],
+            },
+          },
+          properties: {
+            id: beach.id,
+            name: beach.properties.nama,
+            image: beach.properties.image_thumb,
+            rating: beach.properties.rating,
+            kecamatan: beach.properties.kecamatan,
+            alamat: beach.properties.alamat,
+          },
+        });
+      });
+    });
+  };
+
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3;
@@ -460,7 +433,7 @@ const MapsPage = () => {
   };
 
   const handleDetailClick = (id) => {
-  
+
     router.push(`/detail/${id}`);
   };
 
@@ -492,19 +465,19 @@ const MapsPage = () => {
     >
       X
     </button>
-    {selectedPlace.image && (
+    {selectedPlace.properties.image && (
       <img
-        src={selectedPlace.image}
-        alt={selectedPlace.nama}
+        src={selectedPlace.properties.image}
+        alt={selectedPlace.properties.name}
         className="w-full h-24 object-cover mb-2 rounded-lg"
       />
     )}
-    <p className="font-bold text-sm md:text-xs">{selectedPlace.nama}</p>
-    {selectedPlace.rating && (
-      <p className="text-sm md:text-xs">Rating: {selectedPlace.rating}</p>
+    <p className="font-bold text-sm md:text-xs">{selectedPlace.properties.name}</p>
+    {selectedPlace.properties.rating && (
+      <p className="text-sm md:text-xs">Rating: {selectedPlace.properties.rating}</p>
     )}
-    {selectedPlace.kecamatan && (
-      <p className="text-sm md:text-xs">Kecamatan: {selectedPlace.kecamatan}</p>
+    {selectedPlace.properties.kecamatan && (
+      <p className="text-sm md:text-xs">Kecamatan: {selectedPlace.properties.kecamatan}</p>
     )}
     {weather && (
       <div className="flex items-center mt-1">
@@ -520,36 +493,36 @@ const MapsPage = () => {
       <button
         className="bg-blue-500 text-white px-2 py-2 rounded-lg w-full md:w-28 m-1 md:m-2 hover:bg-blue-700 transition-all duration-300"
         onClick={() =>
-          handleDetailClick(selectedPlace.id)
+          handleDetailClick(selectedPlace.properties.id)
         }
       >
         Detail
       </button>
-<button
-className="bg-green-500 text-white px-2 py-2 rounded-lg w-full md:w-28 m-1 md:m-2 hover:bg-green-600 transition-all duration-300"
-onClick={() => {
-console.log("Tombol diklik!"); // Debugging
-const profile = document.querySelector('.mapbox-directions-profile');
-console.log("Profile Element:", profile); // Pastikan elemen ditemukan
+      <button
+      className="bg-green-500 text-white px-2 py-2 rounded-lg w-full md:w-28 m-1 md:m-2 hover:bg-green-600 transition-all duration-300"
+      onClick={() => {
+      console.log("Tombol diklik!"); // Debugging
+      const profile = document.querySelector('.mapbox-directions-profile');
+      console.log("Profile Element:", profile); // Pastikan elemen ditemukan
 
-if (profile) {
-profile.style.display = 'block';
-} else {
-console.error("Elemen .mapbox-directions-profile tidak ditemukan!");
-}
+      if (profile) {
+      profile.style.display = 'block';
+      } else {
+      console.error("Elemen .mapbox-directions-profile tidak ditemukan!");
+      }
 
-handleRouteClick([
-selectedPlace.geometry.coordinates._long,
-selectedPlace.geometry.coordinates._lat,
-]);
-}}
->
-Rute
-</button>
+      handleRouteClick([
+      selectedPlace.geometry.coordinates._long,
+      selectedPlace.geometry.coordinates._lat,
+      ]);
+      }}
+      >
+      Rute
+      </button>
 
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
 
 
